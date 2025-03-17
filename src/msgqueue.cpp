@@ -260,18 +260,20 @@ int CSNMPMessage::ResendMessage()
   m_target->set_retry(m_target->get_retry() - 1);
   SetSendTime();
   int status;
-  if (m_target->get_version() == version3) {
 #ifdef _SNMPv3
+  if (m_target->get_version() == version3) {
     // delete entry in cache
     if (m_snmp->get_mpv3())
 	    m_snmp->get_mpv3()->delete_from_cache(m_pdu.get_request_id());
-#endif
     status = m_snmp->snmp_engine(m_pdu, m_pdu.get_error_status(), m_pdu.get_error_index(),
 		    *m_target, m_callBack, m_callData, m_socket, 0, this);
   }
   else {
+#endif
     status = send_snmp_request(m_socket, m_rawPdu, m_rawPduLen, *m_address);
+#ifdef _SNMPv3
   }
+#endif
   if (status != 0)
     return SNMP_CLASS_TL_FAILED;
 

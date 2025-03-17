@@ -16,11 +16,11 @@ set (CMAKE_CXX_STANDARD 14)
 list (APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
 
-option (OPTION_SNMPv3  "Enable support for SNMPv3" ON)
-option (OPTION_IPv6    "Enable support for IPv6" ON)
-option (OPTION_THREADS "Enable support for threads" ON)
+option (OPTION_SNMPv3  "Enable support for SNMPv3" OFF)
+option (OPTION_IPv6    "Enable support for IPv6" OFF)
+option (OPTION_THREADS "Enable support for threads" OFF)
 option (OPTION_NAMESPACE "Enable using of namespace" ON)
-option (OPTION_LOGGING "Enable logging" ON)
+option (OPTION_LOGGING "Enable logging" OFF)
 option (OPTION_MACADDR "Enable MacAddress class" OFF)
 option (OPTION_IPXADDR "Enable IpxAddress class" OFF)
 option (OPTION_OPENSSL "Search for OpenSSL library" ON)
@@ -28,7 +28,7 @@ option (OPTION_LIBDES "Search for DES library" OFF)
 option (OPTION_LIBTOMCRYPT "Search for Tomcrypt library" OFF)
 option (OPTION_EXTENDED_DEBUG "Enable additional debug messages" OFF)
 
-set (LogProfile "original" CACHE STRING
+set (LogProfile "off" CACHE STRING
   "Log Profile")
 
 set (LogProfileValues "original;off;quiet;std;events;verbose;full;debug;schwafel" CACHE STRING
@@ -476,34 +476,34 @@ set_property (TARGET snmp++ PROPERTY POSITION_INDEPENDENT_CODE 1)
 # Set .so version as autoconf does: snmp++ version 1.2.3 will go to .so.12.0.3!
 set_target_properties (snmp++ PROPERTIES VERSION ${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}.0.${PROJECT_VERSION_PATCH} SOVERSION ${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR})
 
-set (EXAMPLE_SOURCE_FILES
-  consoleExamples/receive_trap.cpp
-  consoleExamples/snmpBulk.cpp
-  consoleExamples/snmpDiscover.cpp
-  consoleExamples/snmpGet.cpp
-  consoleExamples/snmpInform.cpp
-  consoleExamples/snmpNext.cpp
-  consoleExamples/snmpNextAsync.cpp
-  consoleExamples/snmpPasswd.cpp
-  consoleExamples/snmpSet.cpp
-  consoleExamples/snmpTraps.cpp
-  consoleExamples/snmpWalk.cpp
-  consoleExamples/snmpWalkThreads.cpp
-  consoleExamples/test_app.cpp
-)
+# set (EXAMPLE_SOURCE_FILES
+#   consoleExamples/receive_trap.cpp
+#   consoleExamples/snmpBulk.cpp
+#   consoleExamples/snmpDiscover.cpp
+#   consoleExamples/snmpGet.cpp
+#   consoleExamples/snmpInform.cpp
+#   consoleExamples/snmpNext.cpp
+#   consoleExamples/snmpNextAsync.cpp
+#   consoleExamples/snmpPasswd.cpp
+#   consoleExamples/snmpSet.cpp
+#   consoleExamples/snmpTraps.cpp
+#   consoleExamples/snmpWalk.cpp
+#   consoleExamples/snmpWalkThreads.cpp
+#   consoleExamples/test_app.cpp
+# )
 
-foreach (examplesourcefile ${EXAMPLE_SOURCE_FILES})
-    string (REPLACE ".cpp" "" examplename ${examplesourcefile})
-    string (REPLACE "consoleExamples/" "" examplename ${examplename})
-    add_executable (${examplename} ${examplesourcefile})
-    target_link_libraries (${examplename} snmp++)
-    if (WITH_THREADS)
-      if (NOT APPLE)
-        target_link_libraries (${examplename} Threads::Threads)
-      endif (NOT APPLE)
-    endif ()
+# foreach (examplesourcefile ${EXAMPLE_SOURCE_FILES})
+#     string (REPLACE ".cpp" "" examplename ${examplesourcefile})
+#     string (REPLACE "consoleExamples/" "" examplename ${examplename})
+#     add_executable (${examplename} ${examplesourcefile})
+#     target_link_libraries (${examplename} snmp++)
+#     if (WITH_THREADS)
+#       if (NOT APPLE)
+#         target_link_libraries (${examplename} Threads::Threads)
+#       endif (NOT APPLE)
+#     endif ()
 
-endforeach (examplesourcefile ${EXAMPLE_SOURCE_FILES})
+# endforeach (examplesourcefile ${EXAMPLE_SOURCE_FILES})
 
 add_library (snmp++_static STATIC
   ${MY_HEADER_FILES}
