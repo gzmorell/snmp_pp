@@ -4,7 +4,7 @@
   _##
   _##  SNMP++ v3.4
   _##  -----------------------------------------------
-  _##  Copyright (c) 2001-2021 Jochen Katz, Frank Fock
+  _##  Copyright (c) 2001-2025 Jochen Katz, Frank Fock
   _##
   _##  This software is based on SNMP++2.6 from Hewlett Packard:
   _##  
@@ -266,7 +266,7 @@ void CTarget::clear()
 UTarget::UTarget()
   : security_name(INITIAL_USER),
 #ifdef _SNMPv3
-  security_model(SNMP_SECURITY_MODEL_USM), engine_id("")
+  security_model(SNMP_SECURITY_MODEL_USM), engine_id(""), coexistence_security_name(nullptr)
 #else
   security_model(SNMP_SECURITY_MODEL_V1)
 #endif
@@ -280,7 +280,7 @@ UTarget::UTarget()
 UTarget::UTarget(const Address &address, const char *sec_name, const int sec_model)
   : SnmpTarget(address), security_name(sec_name), security_model(sec_model)
 #ifdef _SNMPv3
-    ,engine_id("")
+    ,engine_id(""), coexistence_security_name(nullptr)
 #endif
 {
   version = UTARGET_DEFAULT_VERSION;
@@ -292,7 +292,7 @@ UTarget::UTarget(const Address &address, const char *sec_name, const int sec_mod
 UTarget::UTarget(const Address &address, const OctetStr &sec_name, const int sec_model)
   : SnmpTarget(address), security_name(sec_name), security_model(sec_model)
 #ifdef _SNMPv3
-    ,engine_id("")
+    ,engine_id(""), coexistence_security_name(nullptr)
 #endif
 {
   version = UTARGET_DEFAULT_VERSION;
@@ -304,7 +304,7 @@ UTarget::UTarget(const Address &address, const OctetStr &sec_name, const int sec
 UTarget::UTarget(const Address &address)
   : SnmpTarget(address), security_name(INITIAL_USER),
 #ifdef _SNMPv3
-    security_model(SNMP_SECURITY_MODEL_USM), engine_id("")
+    security_model(SNMP_SECURITY_MODEL_USM), engine_id(""), coexistence_security_name(nullptr)
 #else
     security_model(SNMP_SECURITY_MODEL_V1)
 #endif
@@ -320,15 +320,20 @@ UTarget::UTarget(const UTarget &target)
     security_name(target.security_name),
     security_model(target.security_model)
 #ifdef _SNMPv3
-    , engine_id(target.engine_id)
+    , engine_id(target.engine_id), coexistence_security_name(nullptr)
 #endif
 {
-  my_address = target.my_address;
-  timeout = target.timeout;
-  retries = target.retries;
-  version = target.version;
-  validity = target.validity;
-  ttype = type_utarget;
+    my_address = target.my_address;
+    timeout = target.timeout;
+    retries = target.retries;
+    version = target.version;
+    validity = target.validity;
+#ifdef _SNMPv3
+    if (target.coexistence_security_name) {
+        coexistence_security_name = new OctetStr(*target.coexistence_security_name);
+    }
+#endif
+    ttype = type_utarget;
 }
 
 
@@ -370,6 +375,10 @@ UTarget& UTarget::operator=(const UTarget& target)
 
 #ifdef _SNMPv3
   engine_id = target.engine_id;
+  if (target.coexistence_security_name)
+  {
+    coexistence_security_name = new OctetStr(*target.coexistence_security_name);
+  }
 #endif
   security_name = target.security_name;
   security_model = target.security_model;
@@ -401,6 +410,11 @@ void UTarget::clear()
 #ifdef _SNMPv3
   security_model = SNMP_SECURITY_MODEL_USM;
   engine_id.clear();
+  if (coexistence_security_name)
+  {
+    delete coexistence_security_name;
+    coexistence_security_name = nullptr;
+  }
 #else
   security_model = SNMP_SECURITY_MODEL_V1;
 #endif

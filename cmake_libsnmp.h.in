@@ -268,4 +268,9 @@ typedef @TYPE_UINT64_T@ pp_type_uint64;
 # include <iostream.h>
 #endif
 
+#cmakedefine HAVE_PID_T
+#if !defined(HAVE_PID_T)
+# define pid_t int
+#endif
+
 #endif /* ?__LIBSNMP_H_INCLUDED__ */

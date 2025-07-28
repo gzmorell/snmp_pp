@@ -273,7 +273,7 @@ int operator>=(const OctetStr &lhs, const OctetStr &rhs)
   return (lhs.nCompare(maxlen, rhs) >=0);
 }
 
-//===============[ equivlence operator overloaded ]===================
+//===============[ equivalence operator overloaded ]===================
 int operator==(const OctetStr &lhs, const char *rhs)
 {
   OctetStr to(rhs);
@@ -282,7 +282,7 @@ int operator==(const OctetStr &lhs, const char *rhs)
   return (lhs.nCompare(to.smival.value.string.len, to) == 0);
 }
 
-//===============[ not equivlence operator overloaded ]===============
+//===============[ not equivalence operator overloaded ]===============
 int operator!=(const OctetStr &lhs, const char *rhs)
 {
   OctetStr to(rhs);

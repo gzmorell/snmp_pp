@@ -32,10 +32,10 @@
 #include <libsnmp.h>
 #endif
 
-#define SNMP_PP_VERSION_STRING "3.5.0"
+#define SNMP_PP_VERSION_STRING "3.6.3"
 #define SNMP_PP_VERSION 3
-#define SNMP_PP_RELEASE 5
-#define SNMP_PP_PATCHLEVEL 0
+#define SNMP_PP_RELEASE 6
+#define SNMP_PP_PATCHLEVEL 3
 
 //! The maximum size of a message that can be sent or received.
 #define MAX_SNMP_PACKET 4096
@@ -99,6 +99,7 @@
 #if defined(_SNMPv3) || !defined(_NO_SNMPv3)
 #  if defined(HAVE_LIBSSL)
 #    define _USE_OPENSSL
+#    define _USE_3DES_EDE
 #  elif defined(HAVE_LIBTOMCRYPT)
 #    define _USE_LIBTOMCRYPT
 #  elif HAVE_LIBDES

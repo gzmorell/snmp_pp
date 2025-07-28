@@ -51,15 +51,15 @@ AC_DEFUN([AX_CXX_COMPILE_STDCXX], [dnl
   m4_if([$1], [11], [ax_cxx_compile_alternatives="11 0x"],
         [$1], [14], [ax_cxx_compile_alternatives="14 1y"],
         [$1], [17], [ax_cxx_compile_alternatives="17 1z"],
-        [m4_fatal([invalid first argument `$1' to AX_CXX_COMPILE_STDCXX])])dnl
+        [m4_fatal([invalid first argument `$1` to AX_CXX_COMPILE_STDCXX])])dnl
   m4_if([$2], [], [],
         [$2], [ext], [],
         [$2], [noext], [],
-        [m4_fatal([invalid second argument `$2' to AX_CXX_COMPILE_STDCXX])])dnl
+        [m4_fatal([invalid second argument `$2` to AX_CXX_COMPILE_STDCXX])])dnl
   m4_if([$3], [], [ax_cxx_compile_cxx$1_required=true],
         [$3], [mandatory], [ax_cxx_compile_cxx$1_required=true],
         [$3], [optional], [ax_cxx_compile_cxx$1_required=false],
-        [m4_fatal([invalid third argument `$3' to AX_CXX_COMPILE_STDCXX])])
+        [m4_fatal([invalid third argument `$3` to AX_CXX_COMPILE_STDCXX])])
   AC_LANG_PUSH([C++])dnl
   ac_success=no
 

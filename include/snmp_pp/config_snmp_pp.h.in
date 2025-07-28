@@ -99,6 +99,7 @@
 #if defined(_SNMPv3) || !defined(_NO_SNMPv3)
 #  if defined(HAVE_LIBSSL)
 #    define _USE_OPENSSL
+#    define _USE_3DES_EDE
 #  elif defined(HAVE_LIBTOMCRYPT)
 #    define _USE_LIBTOMCRYPT
 #  elif HAVE_LIBDES

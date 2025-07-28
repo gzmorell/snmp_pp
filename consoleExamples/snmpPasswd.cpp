@@ -134,11 +134,13 @@ static void help()
 int main(int argc, char **argv)
 {
    //---------[ check the arg count ]----------------------------------------
-   if (argc < 4)
+   if (argc < 2)
      usage();
    if (strstr(argv[1],"-h") != 0)
      help();
    if (strstr(argv[1],"-?") != 0)
+     usage();
+   if (argc < 4)
      usage();
 
 #if !defined(_NO_LOGGING) && !defined(WITH_LOG_PROFILES)

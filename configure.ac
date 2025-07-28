@@ -4,7 +4,7 @@
   ##
   ##  SNMP++ v3.4
   ##  -----------------------------------------------
-  ##  Copyright (c) 2001-2021 Jochen Katz, Frank Fock
+  ##  Copyright (c) 2001-2024 Jochen Katz, Frank Fock
   ##
   ##  This software is based on SNMP++2.6 from Hewlett Packard:
   ##  
@@ -27,12 +27,12 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
-dnl don't require higher autoconf version for win32 support
-AC_PREREQ([2.64])
-AC_INIT([snmp++], [3.5.0], [support@agentpp.com],[snmp++])
+dnl do not require higher autoconf version for win32 support
+AC_PREREQ([2.71])
+AC_INIT([snmp++],[3.6.3],[support@agentpp.com],[snmp++])
 SNMP_PP_MAJOR_VERSION=3
-SNMP_PP_MINOR_VERSION=5
-SNMP_PP_MICRO_VERSION=0
+SNMP_PP_MINOR_VERSION=6
+SNMP_PP_MICRO_VERSION=3
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall foreign])
@@ -41,7 +41,7 @@ AC_CONFIG_HEADERS([config.h])
 AM_MAINTAINER_MODE([disable])
 
 dnl
-dnl Get cannonical host
+dnl Get canonical host
 dnl
 AC_CANONICAL_HOST
 AC_DEFINE_UNQUOTED([OS_TYPE], "$host_os",
@@ -52,7 +52,6 @@ AC_DEFUN([AC_PROG_F77], [:])
 AC_DEFUN([AC_PROG_FC], [:])
 AC_DEFUN([AC_PROG_OBJC], [:])
 AC_DEFUN([AC_PROG_OBJCCPP], [:])
-AC_DEFUN([AC_LIBTOOL_F77], [:])
 
 dnl disable check for GNU compatible malloc - just a working malloc is enough
 AC_DEFUN([AC_FUNC_MALLOC_IF], [:])
@@ -75,23 +74,21 @@ PKG_PROG_PKG_CONFIG
 
 dnl Check for extra flags to enable some kind of behavior
 AC_CHECK_DECL([_AIX],[ac_cv_need_minus_d_linux_source_compat="yes"; ac_cv_need_minus_d_all_source="yes"])
-AC_CHECK_DECL([__linux],[ac_cv_need_minus_d_gnu_source="yes"]) dnl probably required by kfreebsd, too?
+AC_CHECK_DECL([__linux],[ac_cv_need_minus_d_gnu_source="yes"])
+dnl probably required by kfreebsd, too?
 AC_CHECK_DECL([__sun],[ac_cv_need_minus_d_extensions="yes"])
 
-AS_IF([test "x$ac_cv_need_minus_d_linux_source_compat" = "xyes"],
-      [CPPFLAGS="$CPPFLAGS -D_LINUX_SOURCE_COMPAT"])
+#AS_IF([test "x$ac_cv_need_minus_d_linux_source_compat" = "xyes"],
+#      [CPPFLAGS="$CPPFLAGS -D_LINUX_SOURCE_COMPAT"])
 
-AS_IF([test "x$ac_cv_need_minus_d_gnu_source" = "xyes"],
-      [CPPFLAGS="$CPPFLAGS -D_GNU_SOURCE"])
+#AS_IF([test "x$ac_cv_need_minus_d_gnu_source" = "xyes"],
+#      [CPPFLAGS="$CPPFLAGS -D_GNU_SOURCE"])
 
-AS_IF([test "x$ac_cv_need_minus_d_all_source" = "xyes"],
-      [CPPFLAGS="$CPPFLAGS -D_ALL_SOURCE"])
+#AS_IF([test "x$ac_cv_need_minus_d_all_source" = "xyes"],
+#      [CPPFLAGS="$CPPFLAGS -D_ALL_SOURCE"])
 
-AS_IF([test "x$ac_cv_need_minus_d_extensions" = "xyes"],
-      [CPPFLAGS="$CPPFLAGS -D__EXTENSIONS__"])
-
-ACX_CHECK_XOPEN_SOURCE
-AS_IF([test -n "$XOPEN_SOURCE_CPPFLAGS"], [CPPFLAGS="$CPPFLAGS $XOPEN_SOURCE_CPPFLAGS"])
+#AS_IF([test "x$ac_cv_need_minus_d_extensions" = "xyes"],
+#      [CPPFLAGS="$CPPFLAGS -D__EXTENSIONS__"])
 
 dnl
 dnl Process features.
@@ -152,7 +149,7 @@ AC_ARG_WITH([log-profile], [
 [WITH_LOG_PROFILE="$withval"], [WITH_LOG_PROFILE="default"])
 
 AS_IF([test "x${ENABLE_DEBUG}" = "xyes"],
-      [AC_DEFINE([DEBUG], 1, [Define if you want the debug output support compiled in.])],
+      [AC_DEFINE([DEBUG], [1], [Define if you want the debug output support compiled in.])],
       [AC_LIB_APPENDTOVAR([CXXFLAGS], [-D_NDEBUG])]
 )
 AS_IF([test "x${ENABLE_MACADDRESS}" = "xyes"], [WITH_MACADDRESS=1], [WITH_MACADDRESS=0])
@@ -168,18 +165,18 @@ AS_IF([test "x${ENABLE_THREADS}" = "xyes"], [
         WITH_THREADS=1
     ],
     [
-        ACX_PTHREAD([
-            AC_DEFINE([ENABLE_THREADS], 1,
+        AX_PTHREAD([
+            AC_DEFINE([ENABLE_THREADS], [1],
                 [Define if you want the thread support compiled in.])
-            AC_DEFINE(HAVE_PTHREAD, 1,
+            AC_DEFINE([HAVE_PTHREAD], [1],
                 [Define if you have POSIX threads libraries and header files.])
             CC="$PTHREAD_CC"
             CXX="$PTHREAD_CXX"
-            AS_IF([test -n "$PTHREAD_LIBS"], [LIBS="$PTHREAD_LIBS $LIBS"])
+            AS_IF([test -n "$PTHREAD_LIBS"], [LIBS="$PTHREAD_LIBS $LIBS"], [])
             AS_IF([test -n "$PTHREAD_CFLAGS"], [
               CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
               CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
-            ])
+            ], [])
             ac_cv_enable_threads=yes
             WITH_PTHREAD=1
             WITH_THREADS=1
@@ -191,8 +188,10 @@ AS_IF([test "x${ENABLE_THREADS}" = "xyes"], [
 
 dnl Checks for libraries.
 
-dnl Checks for header files.
-AC_HEADER_STDC
+# Autoupdate added the next two lines to ensure backward compatibility. They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 AC_CHECK_HEADERS([arpa/inet.h ctype.h errno.h float.h inttypes.h limits.h memory.h netdb.h netinet/in.h poll.h signal.h stdio.h stdlib.h string.h strings.h sys/param.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/types.h sys/unistd.h time.h unistd.h])
 
 if test "$ac_cv_header_stdc" = "yes"; then
@@ -367,7 +366,7 @@ fi
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
+#AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_INT8_T
 AC_TYPE_INT16_T
@@ -671,7 +670,7 @@ ACX_CHECK_LIB_FLAGS([ssl], [crypto,dl,crypto dl], [SSL_library_init()], [AC_LANG
 )
 
 WITH_LIBTOMCRYPT=0
-dnl --with-tomcrypt: check if it's no
+dnl --with-tomcrypt: check if it is no
 ACX_CHECK_LIB_FLAGS([tomcrypt], [], [find_cipher()], [AC_LANG_SOURCE([
 #include <tomcrypt_cipher.h>
   ])], ,
@@ -694,7 +693,7 @@ des_ecb_encrypt((C_Block *)0,(C_Block *)0,ks,DES_ENCRYPT)])], [AC_LANG_SOURCE([
     WITH_LIBDES=1
     AC_LIB_APPENDTOVAR([LINKFLAGS], ${LIBS_DES})
     AC_LIB_APPENDTOVAR([CLIBFLAGS], ${INC_DES})
-    AC_MSG_NOTICE([compiling in support for libdes (LIBS="$LIBS_DES}")using des.h])
+    AC_MSG_NOTICE([compiling in support for libdes (LIBS="${LIBS_DES}")using des.h])
   ])],
   [
     dnl some packaging systems package libdes.h instead of des.h
@@ -710,7 +709,7 @@ des_ecb_encrypt((C_Block *)0,(C_Block *)0,ks,DES_ENCRYPT)])], [AC_LANG_SOURCE([
         AC_DEFINE([HAVE_LIBDES_H], 1, [Define when libdes.h shall be favored over des.h])
         AC_LIB_APPENDTOVAR([LINKFLAGS], ${LIBS_DES})
         AC_LIB_APPENDTOVAR([CLIBFLAGS], ${INC_DES})
-        AC_MSG_NOTICE([compiling in support for libdes (LIBS="$LIBS_DES}") using libdes.h])
+        AC_MSG_NOTICE([compiling in support for libdes (LIBS="${LIBS_DES}") using libdes.h])
       ],
       [WITH_LIBDES=0]
     )
@@ -758,9 +757,7 @@ else
 	CNF_STDCXX_98_HEADERS=0
 fi
 
-
 LT_INIT
-AC_PROG_LIBTOOL
 
 AC_SUBST(SNMP_PP_MAJOR_VERSION)
 AC_SUBST(SNMP_PP_MINOR_VERSION)
@@ -823,4 +820,5 @@ AC_SUBST(CNF_HAVE_NAMESPACE_STD)
 AC_SUBST(CNF_HAVE_SYS_PARAM_H)
 
 AC_CONFIG_FILES([Makefile include/Makefile include/snmp_pp/Makefile consoleExamples/Makefile src/Makefile])
-AC_OUTPUT(snmp++-3.pc include/snmp_pp/config_snmp_pp.h libsnmp.h)
+AC_CONFIG_FILES([snmp++-3.pc include/snmp_pp/config_snmp_pp.h libsnmp.h])
+AC_OUTPUT

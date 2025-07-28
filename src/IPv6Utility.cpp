@@ -72,7 +72,7 @@
 
 #if defined(_MSC_VER)
 static int
-snprintf (char *str, int n, char *fmt, ...)
+snprintf (char *str, size_t n, char *fmt, ...)
 {
   va_list a;
   va_start (a, fmt);

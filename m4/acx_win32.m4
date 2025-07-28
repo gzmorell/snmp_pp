@@ -4,7 +4,7 @@ dnl @summary figure out whether the target is native WIN32 or not
 
 AC_DEFUN([ACX_WIN32], [
 AC_LANG_SAVE
-AC_LANG_C
+AC_LANG([C])
     AC_CACHE_CHECK(
         [whether compiling for native Win32],
         ac_cv_native_win32,

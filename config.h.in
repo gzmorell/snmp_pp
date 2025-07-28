@@ -136,6 +136,9 @@
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
 
+/* Have PTHREAD_PRIO_INHERIT. */
+#undef HAVE_PTHREAD_PRIO_INHERIT
+
 /* Define to 1 if you have the `realloc' function. */
 #undef HAVE_REALLOC
 
@@ -150,9 +153,6 @@
 
 /* define if the compiler supports ISO C++ standard library */
 #undef HAVE_STD
-
-/* Define to 1 if stdbool.h conforms to C99. */
-#undef HAVE_STDBOOL_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -241,12 +241,6 @@
 /* Define to 1 if you have the <wspiapi.h> header file. */
 #undef HAVE_WSPIAPI_H
 
-/* _XOPEN_SOURCE $HAVE_XOPEN_SOURCE */
-#undef HAVE_XOPEN_SOURCE
-
-/* Define to 1 if the system has the type `_Bool'. */
-#undef HAVE__BOOL
-
 /* Define to 1 if you have the `_getpid' function. */
 #undef HAVE__GETPID
 
@@ -293,7 +287,9 @@
 /* Define if ISO C++ TR1 header files are present. */
 #undef STDCXX_TR1_HEADERS
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
 
 /* Version number of package */
@@ -348,7 +344,7 @@
 /* Define to `long int' if <sys/types.h> does not define. */
 #undef off_t
 
-/* Define to `int' if <sys/types.h> does not define. */
+/* Define as a signed integer type capable of holding a process identifier. */
 #undef pid_t
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */

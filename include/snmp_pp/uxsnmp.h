@@ -471,7 +471,7 @@ class DLLOPT Snmp: public SnmpSynchronized
    * @note Every call to one of the notify_register() methods overwrites
    *       the previous given values.
    *
-   * @param trapids       - ids to listen for
+   * @param trapids       - trap ids to listen for
    * @param targets       - targets to listen for
    * @param callback      - User callback function to use
    * @param callback_data - User definable data pointer
@@ -630,6 +630,7 @@ protected:
   //--------[ map action ]------------------------------------------------
   // map the snmp++ action to a SMI pdu type
   void map_action(unsigned short action, unsigned short &pdu_action);
+  void map_action_to_async(unsigned short pdu_action, unsigned short &action);
 
 #ifdef _SNMPv3
   /**

@@ -142,7 +142,8 @@ int CSNMPMessage::SetPdu(const int reason, const Pdu &pdu,
                          const UdpAddress & /* fromaddress */)
 {
 #ifdef _SNMPv3
-  if (m_pdu.get_message_id() != pdu.get_message_id())
+  if ((m_target->get_version() == version3) &&
+      (m_pdu.get_message_id() != pdu.get_message_id()))
   {
     LOG_BEGIN(loggerModuleName, INFO_LOG | 1);
     LOG("MsgQueue: Ignore response that does not match message id: (id1) (type2) (msgid1) (msgid2");
@@ -265,15 +266,19 @@ int CSNMPMessage::ResendMessage()
     // delete entry in cache
     if (m_snmp->get_mpv3())
 	    m_snmp->get_mpv3()->delete_from_cache(m_pdu.get_request_id());
+    if (m_callBack) {
+      // Map the action back to the _ASYNC value, so snmp_engine will handle it correctly
+      unsigned short action;
+      m_snmp->map_action_to_async(m_pdu.get_type(), action);
+      m_pdu.set_type(action);
+    }
     status = m_snmp->snmp_engine(m_pdu, m_pdu.get_error_status(), m_pdu.get_error_index(),
 		    *m_target, m_callBack, m_callData, m_socket, 0, this);
   }
-  else {
+  else
 #endif
     status = send_snmp_request(m_socket, m_rawPdu, m_rawPduLen, *m_address);
-#ifdef _SNMPv3
-  }
-#endif
+
   if (status != 0)
     return SNMP_CLASS_TL_FAILED;
 

@@ -577,8 +577,8 @@ int receive_snmp_notification(SnmpSocket sock, Snmp &snmp_session,
 // map the snmp++ action to a SMI pdu type
 void Snmp::map_action( unsigned short action, unsigned short & pdu_action)
 {
-  switch( action)
-    {
+  switch (action)
+  {
     case sNMP_PDU_GET:
     case sNMP_PDU_GET_ASYNC:
       pdu_action = sNMP_PDU_GET;
@@ -615,9 +615,52 @@ void Snmp::map_action( unsigned short action, unsigned short & pdu_action)
     default:
       pdu_action = sNMP_PDU_GET;  // TM ?? error ??
       break;
-
-    };  // end switch
+  }
 }
+
+void Snmp::map_action_to_async(unsigned short pdu_action, unsigned short &action)
+{
+  switch (pdu_action)
+  {
+    case sNMP_PDU_GET:
+    case sNMP_PDU_GET_ASYNC:
+      action = sNMP_PDU_GET_ASYNC;
+      break;
+
+    case sNMP_PDU_SET:
+    case sNMP_PDU_SET_ASYNC:
+      action = sNMP_PDU_SET_ASYNC;
+      break;
+
+    case sNMP_PDU_GETNEXT:
+    case sNMP_PDU_GETNEXT_ASYNC:
+      action = sNMP_PDU_GETNEXT_ASYNC;
+      break;
+
+    case sNMP_PDU_GETBULK:
+    case sNMP_PDU_GETBULK_ASYNC:
+      action = sNMP_PDU_GETBULK_ASYNC;
+      break;
+
+    case sNMP_PDU_RESPONSE:
+      action = sNMP_PDU_RESPONSE;
+      break;
+
+    case sNMP_PDU_INFORM:
+    case sNMP_PDU_INFORM_ASYNC:
+      action = sNMP_PDU_INFORM_ASYNC;
+      break;
+
+    case sNMP_PDU_REPORT:
+      action = sNMP_PDU_REPORT;
+      break;
+
+    default:
+      action = sNMP_PDU_GET_ASYNC;  // TM ?? error ??
+      break;
+  }
+}
+
 
 //------[ Snmp Class Constructor ]--------------------------------------
 
@@ -1568,9 +1611,10 @@ int Snmp::snmp_engine( Pdu &pdu,              // pdu to use
          (action == sNMP_PDU_SET_ASYNC) ||
          (action == sNMP_PDU_GETNEXT_ASYNC) ||
          (action == sNMP_PDU_GETBULK_ASYNC) ||
-         (action == sNMP_PDU_INFORM_ASYNC)))
+         (action == sNMP_PDU_INFORM_ASYNC))) {
+      debugprintf(0, "-- SNMP++, no callback given for async pdu.");
       return SNMP_CLASS_INVALID_CALLBACK;
-
+    }
     //---------[ more mode checking ]--------------------------------
     // if the class was constructed as an async model, callback = something
     // and blocked calls are attempted, an error is returned
@@ -1579,8 +1623,10 @@ int Snmp::snmp_engine( Pdu &pdu,              // pdu to use
          (action == sNMP_PDU_SET) ||
          (action == sNMP_PDU_GETNEXT) ||
          (action == sNMP_PDU_GETBULK) ||
-         (action == sNMP_PDU_INFORM)))
+         (action == sNMP_PDU_INFORM))) {
+      debugprintf(0, "-- SNMP++, callback given for sync pdu.");
       return SNMP_CLASS_INVALID_CALLBACK;
+    }
 
     //---------[ make sure target is valid ]-------------------------
     // make sure that the target is valid
@@ -1602,8 +1648,7 @@ int Snmp::snmp_engine( Pdu &pdu,              // pdu to use
         utarget = (UTarget*)(&target);
         break;
       case SnmpTarget::type_base:
-        debugprintf(0, "-- SNMP++, do not use SnmpTarget,"
-                    "use a  CTarget or UTarget");
+        debugprintf(0, "-- SNMP++, do not use SnmpTarget, use a  CTarget or UTarget");
         return SNMP_CLASS_INVALID_TARGET;
       default:
         /* target is not known */
@@ -1759,7 +1804,7 @@ int Snmp::snmp_engine( Pdu &pdu,              // pdu to use
       pdu.set_error_index((int) max_reps);
     }
 
-    pdu.set_type( pdu_action);
+    pdu.set_type(pdu_action);
     SnmpMessage snmpmsg;
 
 #ifdef _SNMPv3

@@ -1916,7 +1916,7 @@ int PrivAES::decrypt(const unsigned char *key,
 {
   if (*out_buffer_len < buffer_len) {
     debugprintf(0, "Output buffer too small (%d < %d)", *out_buffer_len, buffer_len);
-    return SNMPv3_USM_ENCRYPTION_ERROR;
+    return SNMPv3_USM_DECRYPTION_ERROR;
   }
 
   unsigned char initVect[16];
@@ -2208,6 +2208,75 @@ Priv3DES_EDE::encrypt(const unsigned char *key,
   DES_MEMSET(symcbc, 0, sizeof(symcbc));
 
 #else
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000
+  EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+  if (!ctx)
+  {
+    debugprintf(1, "EVP_CIPHER_CTX_new() failed.");
+    return SNMPv3_USM_ENCRYPTION_ERROR;
+  }
+
+  const EVP_CIPHER *evp_cipher = EVP_CIPHER_fetch(NULL, "DES-EDE3-CBC", NULL);
+  if (evp_cipher == nullptr)
+  {
+    debugprintf(1, "EVP_CIPHER_fetch() failed.");
+    //ERR_print_errors_fp(stderr);
+    EVP_CIPHER_CTX_free(ctx);
+    return SNMPv3_USM_ENCRYPTION_ERROR;
+  }
+
+  if (EVP_EncryptInit_ex2(ctx, evp_cipher, key, initVect, NULL) != 1)
+  {
+    debugprintf(1, "EVP_EncryptInit_ex2() failed.");
+    EVP_CIPHER_CTX_free(ctx);
+    return SNMPv3_USM_ENCRYPTION_ERROR;
+  }
+
+  // We have to do the padding ourselves!
+  EVP_CIPHER_CTX_set_padding(ctx, 0);
+
+  int len1 = *out_buffer_len;
+  if (EVP_EncryptUpdate(ctx, out_buffer, &len1, buffer, buffer_len) != 1)
+  {
+    debugprintf(1, "EVP_EncryptUpdate() failed.");
+    EVP_CIPHER_CTX_free(ctx);
+    return SNMPv3_USM_ENCRYPTION_ERROR;
+  }
+
+  // Add padding if needed
+  if (buffer_len % 8)
+  {
+     unsigned char tmp_buf[8];
+     memset(tmp_buf, 0, 8);
+
+     int len_pad = *out_buffer_len - len1;
+
+     if (EVP_EncryptUpdate(ctx, out_buffer + len1, &len_pad, tmp_buf, 8 - (buffer_len % 8)) != 1)
+     {
+       debugprintf(1, "EVP_EncryptUpdate() failed.");
+       EVP_CIPHER_CTX_free(ctx);
+       return SNMPv3_USM_ENCRYPTION_ERROR;
+     }
+
+     len1 += len_pad;
+  }
+
+  unsigned char *out_buffer_ptr = out_buffer + len1;
+  int len2 = *out_buffer_len - len1;
+  if (EVP_EncryptFinal_ex(ctx, out_buffer_ptr, &len2) != 1)
+  {
+    debugprintf(1, "EVP_EncryptFinal_ex() failed.");
+    EVP_CIPHER_CTX_free(ctx);
+    return SNMPv3_USM_ENCRYPTION_ERROR;
+  }
+
+  EVP_CIPHER_CTX_free(ctx);
+
+  *out_buffer_len = len1 + len2;
+
+#else // OPENSSL_VERSION_NUMBER >= 0x30000000
+
   DESCBCType ks1, ks2, ks3;
 
   DES_CBC_START_ENCRYPT(unused, unused, key, unused, unused, ks1);
@@ -2242,6 +2311,7 @@ Priv3DES_EDE::encrypt(const unsigned char *key,
   DES_MEMSET(ks1, 0, sizeof(ks1));
   DES_MEMSET(ks2, 0, sizeof(ks2));
   DES_MEMSET(ks3, 0, sizeof(ks3));
+#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
 #endif
 
 #ifdef __DEBUG
@@ -2301,6 +2371,60 @@ Priv3DES_EDE::decrypt(const unsigned char *key,
   DES_MEMSET(symcbc, 0, sizeof(symcbc));
 
 #else
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000
+
+  EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+  if (!ctx)
+  {
+    debugprintf(1, "EVP_CIPHER_CTX_new() failed.");
+    return SNMPv3_USM_DECRYPTION_ERROR;
+  }
+
+  const EVP_CIPHER *evp_cipher = EVP_CIPHER_fetch(NULL, "DES-EDE3-CBC", NULL);
+  if (evp_cipher == nullptr)
+  {
+    debugprintf(1, "EVP_CIPHER_fetch() failed.");
+    EVP_CIPHER_CTX_free(ctx);
+    return SNMPv3_USM_DECRYPTION_ERROR;
+  }
+
+  if (EVP_DecryptInit_ex2(ctx, evp_cipher, key, initVect, NULL) != 1)
+  {
+    debugprintf(1, "EVP_DecryptInit_ex2() failed.");
+    EVP_CIPHER_CTX_free(ctx);
+    return SNMPv3_USM_DECRYPTION_ERROR;
+  }
+
+  // We have to do the padding ourselves!
+  EVP_CIPHER_CTX_set_padding(ctx, 0);
+
+  int len1 = *out_buffer_len;
+  if (EVP_DecryptUpdate(ctx, out_buffer, &len1, buffer, buffer_len) != 1)
+  {
+    debugprintf(1, "EVP_DecryptUpdate() failed.");
+    EVP_CIPHER_CTX_free(ctx);
+    return SNMPv3_USM_DECRYPTION_ERROR;
+  }
+
+  unsigned char *out_buffer_ptr = out_buffer + len1;
+  int len2 = *out_buffer_len - len1;
+  if (EVP_DecryptFinal_ex(ctx, out_buffer_ptr, &len2) != 1)
+  {
+    debugprintf(1, "EVP_DecryptFinal_ex() failed.");
+    EVP_CIPHER_CTX_free(ctx);
+    return SNMPv3_USM_DECRYPTION_ERROR;
+  }
+
+  EVP_CIPHER_CTX_free(ctx);
+
+  if (len1 + len2 != static_cast<int>(buffer_len)) {
+    debugprintf(1, "Encryption wrote (%d + %d) bytes instead of (%d)", len1, len2, buffer_len);
+    return SNMPv3_USM_DECRYPTION_ERROR;
+  }
+
+#else // OPENSSL_VERSION_NUMBER >= 0x30000000
+
   DESCBCType ks1, ks2, ks3;
 
   DES_CBC_START_DECRYPT(unused, unused, key, unused, unused, ks1);
@@ -2316,6 +2440,7 @@ Priv3DES_EDE::decrypt(const unsigned char *key,
   DES_MEMSET(ks1, 0, sizeof(ks1));
   DES_MEMSET(ks2, 0, sizeof(ks2));
   DES_MEMSET(ks3, 0, sizeof(ks3));
+#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
 #endif
 
   *out_buffer_len = buffer_len;

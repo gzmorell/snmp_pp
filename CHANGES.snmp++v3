@@ -1,3 +1,41 @@
+Changes snmp++v3.6.3
+====================
+- Added: Install CMake package configuration files (Forum member hb-stulz)
+- Fixed: Responses to requests sent with SNMPv1/2c were dropped if the
+         user code provided a Pdu with a SNMPv3 message id. 
+
+Changes snmp++v3.6.2
+====================
+- Fixed: Bug in UTarget.set_coexistence_security_name not saving the set security_name
+  and not retaining it with copy constructor and assignment if set.
+
+Changes snmp++v3.6.1
+====================
+- Fixed: Compilation error with SNMPv3 disabled in UTarget destructor.
+
+Changes snmp++v3.6.0
+====================
+- Upgraded: autoconf minimum supported version requirement to v2.71.
+- Changed: Do not disable Priv3DES_EDE class when compiling with OpenSSL and
+  do not use deprecated API of OpenSSL 3.
+- Added: Allow storing coexistence_security_name values (i.e., v1/v2c communities) to return them
+  in response messages instead of using the mapped security name, as required by RFC 3584 §5.2.2.
+
+Changes snmp++v3.5.2
+====================
+- Fixed: Retries for async SNMPv3 requests where not sent (caused by changes for version 3.5.0).
+- Fixed: Added missing definition for pid_t as configure script does
+- Fixed: Removed /WX option as a workaround for yet unfixed warnings
+- Added: Link ws2 library
+- Fixed: DLL exported no symbols
+- Improved: Removed snmpWalkThreads example from windows build
+- Improved: Link examples with static library
+- Fixed: Prototype of local defined snprintf function
+
+Changes snmp++v3.5.1
+====================
+- Fixed: Compilation error if _SNMPv3 is not defined (Fabrice Fontaine)
+
 Changes snmp++v3.5.0
 ====================
 

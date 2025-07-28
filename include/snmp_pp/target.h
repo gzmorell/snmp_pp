@@ -4,7 +4,7 @@
   _##
   _##  SNMP++ v3.4
   _##  -----------------------------------------------
-  _##  Copyright (c) 2001-2021 Jochen Katz, Frank Fock
+  _##  Copyright (c) 2001-2024 Jochen Katz, Frank Fock
   _##
   _##  This software is based on SNMP++2.6 from Hewlett Packard:
   _##  
@@ -511,9 +511,15 @@ class DLLOPT UTarget: public SnmpTarget
   UTarget(const UTarget &target);
 
   /**
-   * Destructor, that has nothing to do.
+   * Destructor, that deletes coexistence security name if present.
    */
-  ~UTarget() {};
+  ~UTarget() {
+#  ifdef _SNMPv3
+      if (coexistence_security_name) {
+          delete coexistence_security_name;
+      }
+#  endif
+  };
 
   /**
    * Clone operator.
@@ -594,7 +600,7 @@ class DLLOPT UTarget: public SnmpTarget
   /**
    * Get the engine id.
    *
-   * @return A const reference to the enigne id of this target.
+   * @return A const reference to the engine id of this target.
    */
   const OctetStr& get_engine_id() const { return engine_id; };
 
@@ -604,6 +610,35 @@ class DLLOPT UTarget: public SnmpTarget
    * @param oct - OctetStr that will be filled with the engine id
    */
   void get_engine_id(OctetStr& oct) const { oct = engine_id; };
+
+  /**
+   * Set the security name and store the previously set security name as
+   * coexistence_security_name that can be restored with unset_coexistence_security_name.
+   *
+   * @param oct - The new security name mapped through coexistence info
+   * @since 3.6.0
+   */
+  void set_coexistence_security_name(const OctetStr& oct) {
+      if (coexistence_security_name) {
+            delete coexistence_security_name;
+      }
+      coexistence_security_name = new OctetStr(security_name);
+      security_name = oct;
+  };
+
+  /**
+   * Set the security_name to the previously saved coexistence_security_name (if present) and delete that saved value.
+   * Otherwise, do nothing.
+   * @since 3.6.0
+   */
+  void unset_coexistence_security_name() {
+      if (coexistence_security_name) {
+          security_name = *coexistence_security_name;
+          delete coexistence_security_name;
+          coexistence_security_name = nullptr;
+      }
+  }
+
 #endif
 
   /**
@@ -626,7 +661,7 @@ class DLLOPT UTarget: public SnmpTarget
   UTarget& operator=(const UTarget& target);
 
   /**
-   * Overloeaded compare operator.
+   * Overloaded compare operator.
    *
    * Two UTarget objects are considered equal, if all member variables
    * (beside the engine id) and the base classes are equal.
@@ -664,6 +699,7 @@ class DLLOPT UTarget: public SnmpTarget
   int security_model;
 #ifdef _SNMPv3
   OctetStr engine_id;
+  OctetStr* coexistence_security_name;
 #endif
 };
 

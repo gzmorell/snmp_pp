@@ -50,7 +50,7 @@
 # include <ctime>
 #else
 # include <stdio.h>
-# if 1
+# if 0
 #  include <stdlib.h>
 #  include <stddef.h>
 # else
@@ -59,7 +59,7 @@
 #  endif
 # endif
 # if 1
-#  if !1 && 1
+#  if !0 && 1
 #   include <memory.h>
 #  endif
 #  include <string.h>

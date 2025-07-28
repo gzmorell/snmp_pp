@@ -2,7 +2,7 @@
 README autoconf
 ===============
 
-To use autoconf 2.64 or later with SNMP++, execute the following 
+To use autoconf 2.71 or later with SNMP++, execute the following
 commands in the "snmp++" directory:
 
 autoreconf -i
