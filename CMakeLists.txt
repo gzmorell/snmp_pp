@@ -369,10 +369,11 @@ check_include_files (malloc.h HAVE_MALLOC_H LANGUAGE CXX)
 check_include_files ("sys/param.h;sys/mount.h" HAVE_SYS_MOUNT_H LANGUAGE CXX)
 check_function_exists ("strcasecmp" HAVE_STRCASECMP)
 
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/config.h)
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_libsnmp.h.in ${CMAKE_CURRENT_SOURCE_DIR}/libsnmp.h)
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_libsnmp.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/system/libsnmp.h)
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_libsnmp.h.in ${CMAKE_CURRENT_BINARY_DIR}/libsnmp.h)
+# configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_libsnmp.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/system/libsnmp.h)
+# configure_file (${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h.in ${CMAKE_CURRENT_BINARY_DIR}/config_snmp_pp.h)
 
 set (CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DHAVE_CONFIG_H")
 
@@ -387,6 +388,7 @@ else ()
     add_compile_options (-Wall)
 endif ()
 
+include_directories ("${CMAKE_CURRENT_BINARY_DIR}")
 include_directories (${CMAKE_BINARY_DIR})
 include_directories (.)
 include_directories (include)
@@ -400,7 +402,7 @@ set (MY_HEADER_FILES
   include/snmp_pp/asn1.h
   include/snmp_pp/auth_priv.h
   include/snmp_pp/collect.h
-  include/snmp_pp/config_snmp_pp.h
+  ${CMAKE_CURRENT_BINARY_DIR}/config_snmp_pp.h
   include/snmp_pp/counter.h
   include/snmp_pp/ctr64.h
   include/snmp_pp/eventlist.h
@@ -531,7 +533,7 @@ add_library (snmp++_static STATIC
 
 install (TARGETS snmp++ EXPORT snmp++Targets DESTINATION lib)
 install (TARGETS snmp++_static EXPORT snmp++Targets DESTINATION lib)
-install (FILES ${MY_HEADER_LIB_FILES} DESTINATION include)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${MY_HEADER_LIB_FILES} DESTINATION include)
 install (FILES ${MY_HEADER_FILES} DESTINATION include/snmp_pp)
 
 include(CMakePackageConfigHelpers)
@@ -549,6 +551,6 @@ install(
 )
 
 install(
-    FILES cmake/snmp++Config.cmake ${CMAKE_CURRENT_BINARY_DIR}/snmp++ConfigVersion.cmake
+    FILES cmake/Findsnmp_pp.cmake ${CMAKE_CURRENT_BINARY_DIR}/snmp++ConfigVersion.cmake
     DESTINATION "lib/cmake/snmp++"
 )

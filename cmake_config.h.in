@@ -1,3 +1,4 @@
+#pragma once
 /*_############################################################################
   _## 
   _##  cmake_config.h.in  
@@ -223,7 +224,7 @@
 #define VERSION "@VERSION@"
 
 /* define _NO_SNMPv3 if you do not want to use SNMPv3 */
-#cmakedefine _NO_SNMPv3
+#cmakedefine _NO_SNMPv3 @_NO_SNMPv3@
 
 /* define _SNMPv3 if you want to use SNMPv3 */
 #cmakedefine _SNMPv3 @_SNMPv3@
