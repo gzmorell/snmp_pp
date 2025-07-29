@@ -1,3 +1,10 @@
+Changes snmp++v3.6.4
+====================
+- Removed autotools build system
+- Added cmake Find
+- Default no _snmpv3
+- Build out of source
+
 Changes snmp++v3.6.3
 ====================
 - Added: Install CMake package configuration files (Forum member hb-stulz)
