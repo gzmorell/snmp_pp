@@ -1,7 +1,7 @@
 message (STATUS "Running with CMake ${CMAKE_VERSION}")
 cmake_minimum_required (VERSION 3.15)
 
-project (snmp_pp VERSION 3.6.4 LANGUAGES CXX)
+project (snmp++ VERSION 3.6.4 LANGUAGES CXX)
 enable_language (CXX)
 
 include (CheckIncludeFiles)
@@ -402,7 +402,7 @@ set (MY_HEADER_FILES
   include/snmp_pp/asn1.h
   include/snmp_pp/auth_priv.h
   include/snmp_pp/collect.h
-  snmp_pp/config_snmp_pp.h
+  ${CMAKE_CURRENT_BINARY_DIR}/snmp_pp/config_snmp_pp.h
   include/snmp_pp/counter.h
   include/snmp_pp/ctr64.h
   include/snmp_pp/eventlist.h
@@ -551,6 +551,6 @@ install(
 )
 
 install(
-    FILES cmake/Findsnmp_pp.cmake ${CMAKE_CURRENT_BINARY_DIR}/snmp++ConfigVersion.cmake
+    FILES cmake/Findsnmp++.cmake ${CMAKE_CURRENT_BINARY_DIR}/snmp++ConfigVersion.cmake
     DESTINATION "lib/cmake/snmp++"
 )
