@@ -538,7 +538,7 @@ install (FILES ${MY_HEADER_FILES} DESTINATION include/snmp_pp)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    snmp++ConfigVersion.cmake
+    snmp_ppConfigVersion.cmake
     VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
     COMPATIBILITY AnyNewerVersion
 )
@@ -551,6 +551,6 @@ install(
 )
 
 install(
-    FILES cmake/Findsnmp++.cmake ${CMAKE_CURRENT_BINARY_DIR}/snmp++ConfigVersion.cmake
-    DESTINATION "lib/cmake/snmp++"
+    FILES cmake/Findsnmp_pp.cmake ${CMAKE_CURRENT_BINARY_DIR}/snmp_ppConfigVersion.cmake
+    DESTINATION "share/cmake/Modules/snmp++"
 )
