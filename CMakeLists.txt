@@ -373,7 +373,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in ${CMAKE_CURRENT_BI
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_libsnmp.h.in ${CMAKE_CURRENT_BINARY_DIR}/libsnmp.h)
 # configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake_libsnmp.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/system/libsnmp.h)
 # configure_file (${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h)
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h.in ${CMAKE_CURRENT_BINARY_DIR}/config_snmp_pp.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/include/snmp_pp/config_snmp_pp.h.in ${CMAKE_CURRENT_BINARY_DIR}/snmp_pp/config_snmp_pp.h)
 
 set (CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DHAVE_CONFIG_H")
 
@@ -402,7 +402,7 @@ set (MY_HEADER_FILES
   include/snmp_pp/asn1.h
   include/snmp_pp/auth_priv.h
   include/snmp_pp/collect.h
-  ${CMAKE_CURRENT_BINARY_DIR}/config_snmp_pp.h
+  snmp_pp/config_snmp_pp.h
   include/snmp_pp/counter.h
   include/snmp_pp/ctr64.h
   include/snmp_pp/eventlist.h
