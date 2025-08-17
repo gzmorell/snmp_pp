@@ -552,5 +552,5 @@ install(
 
 install(
     FILES cmake/Findsnmp_pp.cmake ${CMAKE_CURRENT_BINARY_DIR}/snmp_ppConfigVersion.cmake
-    DESTINATION "share/cmake/Modules/snmp++"
+    DESTINATION "share/cmake/Modules"
 )
